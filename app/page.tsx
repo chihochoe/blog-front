@@ -1,103 +1,185 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { Post } from './types/board';
+import Layout from './components/Layout';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 10;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const [posts, setPosts] = useState<Post[]>([
+    {
+      id: 1,
+      title: '첫 번째 게시글',
+      content: '안녕하세요!',
+      author: '홍길동',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 2,
+      title: '두 번째 게시글',
+      content: '반갑습니다!',
+      author: '김철수',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 3,
+      title: '세 번째 게시글',
+      content: '좋은 하루 되세요!',
+      author: '이영희',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 4,
+      title: '네 번째 게시글',
+      content: '오늘도 화이팅!',
+      author: '박민수',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 5,
+      title: '다섯 번째 게시글',
+      content: '즐거운 하루입니다.',
+      author: '정수진',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 6,
+      title: '여섯 번째 게시글',
+      content: '행복한 하루 되세요!',
+      author: '강지원',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 7,
+      title: '일곱 번째 게시글',
+      content: '새로운 소식입니다.',
+      author: '조민재',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 8,
+      title: '여덟 번째 게시글',
+      content: '오늘의 이야기입니다.',
+      author: '윤서연',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 9,
+      title: '아홉 번째 게시글',
+      content: '새로운 소식을 전합니다.',
+      author: '임현우',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 10,
+      title: '열 번째 게시글',
+      content: '마지막 소식입니다.',
+      author: '한미영',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    },
+    {
+      id: 11,
+      title: '열한 번째 게시글',
+      content: '추가 소식입니다.',
+      author: '송지훈',
+      createdAt: '2024-04-17',
+      updatedAt: '2024-04-17'
+    }
+  ]);
+
+  // 현재 페이지의 게시글만 필터링
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  return (
+    <Layout>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">전체 게시글</h2>
+        <Link
+          href="/posts/new"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          글쓰기
+        </Link>
+      </div>
+
+      <div className="bg-white shadow-md rounded-lg">
+        <table className="min-w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">번호</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성자</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작성일</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {currentPosts.map((post) => (
+              <tr key={post.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">{post.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <Link href={`/posts/${post.id}`} className="text-blue-600 hover:text-blue-800">
+                    {post.title}
+                  </Link>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{post.author}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{post.createdAt}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 페이지네이션 */}
+      <div className="flex justify-center mt-4">
+        <nav className="flex items-center gap-1">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            이전
+          </button>
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 rounded border ${currentPage === index + 1
+                ? 'bg-blue-500 text-white'
+                : 'border-gray-300 hover:bg-gray-100'
+                }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50"
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            다음
+          </button>
+        </nav>
+      </div>
+    </Layout>
   );
 }

@@ -1,104 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Post } from './types/board';
 import Layout from './components/Layout';
+import { fetchPosts } from './utils/api';
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const postsPerPage = 10;
 
-  const [posts, setPosts] = useState<Post[]>([
-    {
-      id: 1,
-      title: '첫 번째 게시글',
-      content: '안녕하세요!',
-      author: '홍길동',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 2,
-      title: '두 번째 게시글',
-      content: '반갑습니다!',
-      author: '김철수',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 3,
-      title: '세 번째 게시글',
-      content: '좋은 하루 되세요!',
-      author: '이영희',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 4,
-      title: '네 번째 게시글',
-      content: '오늘도 화이팅!',
-      author: '박민수',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 5,
-      title: '다섯 번째 게시글',
-      content: '즐거운 하루입니다.',
-      author: '정수진',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 6,
-      title: '여섯 번째 게시글',
-      content: '행복한 하루 되세요!',
-      author: '강지원',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 7,
-      title: '일곱 번째 게시글',
-      content: '새로운 소식입니다.',
-      author: '조민재',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 8,
-      title: '여덟 번째 게시글',
-      content: '오늘의 이야기입니다.',
-      author: '윤서연',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 9,
-      title: '아홉 번째 게시글',
-      content: '새로운 소식을 전합니다.',
-      author: '임현우',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 10,
-      title: '열 번째 게시글',
-      content: '마지막 소식입니다.',
-      author: '한미영',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    },
-    {
-      id: 11,
-      title: '열한 번째 게시글',
-      content: '추가 소식입니다.',
-      author: '송지훈',
-      createdAt: '2024-04-17',
-      updatedAt: '2024-04-17'
-    }
-  ]);
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const data = await fetchPosts();
+        setPosts(data);
+        setIsLoading(false);
+      } catch {
+        setError('게시글을 불러오는데 실패했습니다.');
+        setIsLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, []);
 
   // 현재 페이지의 게시글만 필터링
   const indexOfLastPost = currentPage * postsPerPage;
@@ -109,6 +37,26 @@ export default function Home() {
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -163,10 +111,11 @@ export default function Home() {
             <button
               key={index + 1}
               onClick={() => paginate(index + 1)}
-              className={`px-3 py-1 rounded border ${currentPage === index + 1
-                ? 'bg-blue-500 text-white'
-                : 'border-gray-300 hover:bg-gray-100'
-                }`}
+              className={`px-3 py-1 rounded border ${
+                currentPage === index + 1
+                  ? 'bg-blue-500 text-white'
+                  : 'border-gray-300 hover:bg-gray-100'
+              }`}
             >
               {index + 1}
             </button>

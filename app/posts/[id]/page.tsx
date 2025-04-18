@@ -1,30 +1,74 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Post } from '../../types/board';
 import Layout from '../../components/Layout';
+import { fetchPost, deletePost } from '../../utils/api';
 import { use } from 'react';
 
 export default function PostDetail({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
+    const [post, setPost] = useState<Post | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
     const resolvedParams = use(params);
 
-    // TODO: API 호출로 게시글 데이터 가져오기
-    const post: Post = {
-        id: parseInt(resolvedParams.id),
-        title: '첫 번째 게시글',
-        content: '안녕하세요!',
-        author: '홍길동',
-        createdAt: '2024-04-17',
-        updatedAt: '2024-04-17'
-    };
+    useEffect(() => {
+        const loadPost = async () => {
+            try {
+                const data = await fetchPost(parseInt(resolvedParams.id));
+                setPost(data);
+                setIsLoading(false);
+            } catch {
+                setError('게시글을 불러오는데 실패했습니다.');
+                setIsLoading(false);
+            }
+        };
 
-    const handleDelete = () => {
+        loadPost();
+    }, [resolvedParams.id]);
+
+    const handleDelete = async () => {
         if (window.confirm('정말 삭제하시겠습니까?')) {
-            // TODO: API 호출로 게시글 삭제
-            router.push('/');
+            try {
+                await deletePost(parseInt(resolvedParams.id));
+                router.push('/');
+            } catch {
+                setError('게시글 삭제에 실패했습니다.');
+            }
         }
     };
+
+    if (isLoading) {
+        return (
+            <Layout>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+            </Layout>
+        );
+    }
+
+    if (error) {
+        return (
+            <Layout>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {error}
+                </div>
+            </Layout>
+        );
+    }
+
+    if (!post) {
+        return (
+            <Layout>
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+                    게시글을 찾을 수 없습니다.
+                </div>
+            </Layout>
+        );
+    }
 
     return (
         <Layout>

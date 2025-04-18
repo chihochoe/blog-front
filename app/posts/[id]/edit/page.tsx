@@ -1,40 +1,84 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { PostInput } from '../../types/board';
-import Layout from '../../components/Layout';
-import { createPost } from '../../utils/api';
+import { Post } from '../../../types/board';
+import Layout from '../../../components/Layout';
+import { fetchPost, updatePost } from '../../../utils/api';
+import { use } from 'react';
 
-export default function NewPost() {
+export default function EditPost({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
-    const [post, setPost] = useState<PostInput>({
-        title: '',
-        content: '',
-        author: ''
-    });
+    const [post, setPost] = useState<Post | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const resolvedParams = use(params);
+
+    useEffect(() => {
+        const loadPost = async () => {
+            try {
+                const data = await fetchPost(parseInt(resolvedParams.id));
+                setPost(data);
+                setIsLoading(false);
+            } catch {
+                setError('게시글을 불러오는데 실패했습니다.');
+                setIsLoading(false);
+            }
+        };
+
+        loadPost();
+    }, [resolvedParams.id]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!post) return;
+
         try {
-            await createPost(post);
-            router.push('/');
+            await updatePost(post.id, {
+                title: post.title,
+                content: post.content,
+                author: post.author
+            });
+            router.push(`/posts/${post.id}`);
         } catch {
-            setError('게시글 작성에 실패했습니다.');
+            setError('게시글 수정에 실패했습니다.');
         }
     };
+
+    if (isLoading) {
+        return (
+            <Layout>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+            </Layout>
+        );
+    }
+
+    if (error) {
+        return (
+            <Layout>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {error}
+                </div>
+            </Layout>
+        );
+    }
+
+    if (!post) {
+        return (
+            <Layout>
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+                    게시글을 찾을 수 없습니다.
+                </div>
+            </Layout>
+        );
+    }
 
     return (
         <Layout>
             <div className="max-w-2xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8">새 게시글 작성</h1>
-
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                        {error}
-                    </div>
-                )}
+                <h1 className="text-3xl font-bold mb-8">게시글 수정</h1>
 
                 <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6">
                     <div className="mb-4">
@@ -84,7 +128,7 @@ export default function NewPost() {
                             type="submit"
                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         >
-                            작성하기
+                            수정하기
                         </button>
                         <button
                             type="button"

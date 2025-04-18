@@ -1,0 +1,44 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "첫 번째 게시글",
+      "content": "안녕하세요!",
+      "author": "홍길동",
+      "createdAt": "2024-04-17",
+      "updatedAt": "2024-04-17"
+    },
+    {
+      "id": 2,
+      "title": "두 번째 게시글",
+      "content": "반갑습니다!",
+      "author": "김철수",
+      "createdAt": "2024-04-17",
+      "updatedAt": "2024-04-17"
+    },
+    {
+      "id": 3,
+      "title": "세 번째 게시글",
+      "content": "좋은 하루 되세요!",
+      "author": "이영희",
+      "createdAt": "2024-04-17",
+      "updatedAt": "2024-04-17"
+    },
+    {
+      "id": 4,
+      "title": "네 번째 게시글",
+      "content": "오늘도 화이팅!",
+      "author": "박민수",
+      "createdAt": "2024-04-17",
+      "updatedAt": "2024-04-17"
+    },
+    {
+      "id": 5,
+      "title": "다섯 번째 게시글",
+      "content": "즐거운 하루입니다.",
+      "author": "정수진",
+      "createdAt": "2024-04-17",
+      "updatedAt": "2024-04-17"
+    }
+  ]
+} 
